@@ -46,10 +46,59 @@ public class PlayerController : MonoBehaviour
         VectorAnime(axisH, axisV); // 方向アニメを決めるメソッド
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            GetDamage(collision.gameObject);
+        }
+    }
+
     void FixedUpdate()
     {
+        if (inDamage)
+        {
+            // 点滅処理
+
+            return;
+        }
+
         // normalizedで斜め方向の移動速度を1として調整
         rbody.velocity = new Vector2(axisH, axisV).normalized * speed;
+    }
+
+    void GetDamage(GameObject enemy)
+    {
+        hp--;
+        if (hp > 0)
+        {
+            // 動きが止まる
+            rbody.velocity = Vector2.zero;
+
+            // ノックバック（方角計算と移動）
+            Vector3 v = (transform.position - enemy.transform.position).normalized * 4.0f;
+            rbody.AddForce(v, ForceMode2D.Impulse);
+
+            // ダメージフラグを立てる（硬直する）
+            inDamage = true;
+
+            // 時間差でダメージフラグを下げる
+            Invoke("DamageEnd", 0.25f);
+
+        }
+        else
+        {
+            UnityEngine.Debug.Log("ゲームオーバー");
+        }
+    }
+
+    // ダメージフラグを下げる
+    void DamageEnd()
+    {
+        inDamage = false;
+
+        // プレイヤーの姿（SpriteRendererコンポーネント）を明確に表示状態にしておく
+        GetComponent<SpriteRenderer>().enabled = true;
     }
 
     //void VectorAnime(float axisH, float axisV)
