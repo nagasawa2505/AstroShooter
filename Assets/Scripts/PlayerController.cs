@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
 
     float axisH, axisV; // 横軸、縦軸
     public float speed = 3.0f;
-    public float angleZ; // 角度
+    public float angleZ = -90.0f; // 角度
     int direction = 0; // アニメの方向番号
 
     public static int hp = 5; // プレイヤーのタイトル
@@ -52,18 +52,50 @@ public class PlayerController : MonoBehaviour
         rbody.velocity = new Vector2(axisH, axisV).normalized * speed;
     }
 
-    void VectorAnime(float axisH, float axisV)
+    //void VectorAnime(float axisH, float axisV)
+    //{
+    //    angleZ = GetAngle();
+
+    //    int dir;
+
+    //    // 下右上左
+    //    if (angleZ > -135 && angleZ < -45) dir = 0;
+    //    else if (angleZ >= -45 && angleZ <= 45) dir = 3;
+    //    else if (angleZ > 45 && angleZ < 135) dir = 1;
+    //    else dir = 2;
+
+    //    if (dir != direction)
+    //    {
+    //        direction = dir;
+    //        anime.SetInteger("direction", direction);
+    //    }
+    //}
+
+    void VectorAnime(float h, float v)
     {
         angleZ = GetAngle();
 
-        int dir;
+        //なるべきアニメ番号を一時記録用
+        int dir = direction;
 
-        // 下右上左
-        if (angleZ > -135 && angleZ < -45) dir = 0;
-        else if (angleZ >= -45 && angleZ <= 45) dir = 3;
-        else if (angleZ > 45 && angleZ < 135) dir = 1;
-        else dir = 2;
+        //if (angleZ > -135 && angleZ < -45) dir = 0; //下
+        //else if (angleZ >= -45 && angleZ <= 45) dir = 3; //右
+        //else if (angleZ > 45 && angleZ < 135) dir = 1; //上
+        //else dir = 2; //左
 
+        //左右キーが押されたら
+        if (Mathf.Abs(h) >= Mathf.Abs(v))
+        {
+            if (h > 0) dir = 3;       // 右
+            else if (h < 0) dir = 2;  // 左
+        }
+        else //左右キーが押されなかったら
+        {
+            if (v > 0) dir = 1;       // 上
+            else if (v < 0) dir = 0;  // 下
+        }
+
+        //前フレームのdirectionといまあるべきアニメ番号がことなっていなければそのまま
         if (dir != direction)
         {
             direction = dir;
