@@ -62,6 +62,13 @@ public class RifleShooter : MonoBehaviour
     // 弾丸発射
     void Attack()
     {
+        // 残弾チェック
+        if (GameController.hasBullet <= 0)
+        {
+            return;
+        }
+        GameController.hasBullet--;
+
         inAttack = true;
 
         // プレイヤーの角度を生成する弾丸の角度にする

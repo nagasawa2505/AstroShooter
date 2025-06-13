@@ -35,6 +35,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (GameController.gameState != "playing" || inDamage)
+        {
+            return;
+        }
+
         // モバイルからの入力がない場合のみ
         if (!isMobileInput)
         {
@@ -46,25 +51,40 @@ public class PlayerController : MonoBehaviour
         VectorAnime(axisH, axisV); // 方向アニメを決めるメソッド
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Enemy"))
-        {
-            GetDamage(collision.gameObject);
-        }
-    }
-
     void FixedUpdate()
     {
+        if (GameController.gameState != "playing")
+        {
+            return;
+        }
+
         if (inDamage)
         {
-            // 点滅処理
+            // 点滅処理（正負の波をつくる）
+            // Time.timeはゲーム実行からの経過時間(小数つき）
+            float value = Mathf.Sin(Time.time * 50);
+            if (value > 0)
+            {
+                GetComponent<SpriteRenderer>().enabled = true;
+            }
+            else
+            {
+                GetComponent<SpriteRenderer>().enabled = false;
+            }
 
             return;
         }
 
         // normalizedで斜め方向の移動速度を1として調整
         rbody.velocity = new Vector2(axisH, axisV).normalized * speed;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            GetDamage(collision.gameObject);
+        }
     }
 
     void GetDamage(GameObject enemy)
@@ -88,6 +108,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            GameOver();
             UnityEngine.Debug.Log("ゲームオーバー");
         }
     }
@@ -178,5 +199,23 @@ public class PlayerController : MonoBehaviour
         }
 
         return angle;
+    }
+
+    void GameOver()
+    {
+        GameController.gameState = "gameover";
+
+        // ゲームオーバー演出
+        GetComponent<CircleCollider2D>().enabled = false;
+        rbody.velocity = Vector2.zero;
+        rbody.gravityScale = 1;
+        rbody.AddForce(new Vector2(0, 5), ForceMode2D.Impulse);
+        anime.SetTrigger("death");
+    }
+
+    // プレイヤー消滅
+    public void PlayerDestroy()
+    {
+        Destroy(gameObject);
     }
 }
