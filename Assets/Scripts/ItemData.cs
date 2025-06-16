@@ -45,6 +45,7 @@ public class ItemData : MonoBehaviour
         messageCanvas = GameObject.FindGameObjectWithTag("Talk");
         messagePanel = messageCanvas.transform.Find("TalkPanel").gameObject;
         messageText = messagePanel.transform.Find("TalkText").gameObject.GetComponent<TextMeshProUGUI>();
+        messagePanel.SetActive(false);
     }
 
     // Update is called once per frame
