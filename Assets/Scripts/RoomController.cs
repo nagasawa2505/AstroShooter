@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class RoomController : MonoBehaviour
 {
+    // セーブデータをロードした際の移動か
+    public static bool isContinue;
+
     // ゲーム中共通して管理するドア番号
     public static int doorNumber;
 
@@ -15,6 +18,19 @@ public class RoomController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // プレイヤー情報取得
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (isContinue)
+        {
+            // プレイヤーをセーブ時の位置に移動
+            float posX = PlayerPrefs.GetFloat("posX");
+            float posY = PlayerPrefs.GetFloat("posY");
+            player.transform.position = new Vector2(posX, posY);
+
+            return;
+        }
+
         GameObject[] exits = GameObject.FindGameObjectsWithTag("Exit");
         for (int i = 0; i < exits.Length; i++)
         {
@@ -52,7 +68,6 @@ public class RoomController : MonoBehaviour
                         break;
                 }
 
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
                 // 位置
                 player.transform.position = new Vector3(x, y);
                 // 角度
@@ -75,6 +90,7 @@ public class RoomController : MonoBehaviour
     {
         // 次のシーンにドア番号が引き継がれる
         doorNumber = doornum;
+        isContinue = false;
         SceneManager.LoadScene(scenename);
     }
 }

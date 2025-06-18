@@ -16,7 +16,8 @@ public class ItemBox : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        // 自身が消費済みかチェック
+        ExistCheck();
     }
 
     // Update is called once per frame
@@ -75,6 +76,21 @@ public class ItemBox : MonoBehaviour
             player = GameObject.FindGameObjectWithTag("Player");
             Instantiate(itemPrefab, player.transform.position, Quaternion.identity);
 
+            // 消費済みリストに追加してなければ追加
+            if (!SaveController.Instance.IsConsumed(this.tag, arrangeId))
+            {
+                SaveController.Instance.ConsumedEvent(this.tag, arrangeId);
+            }
+        }
+    }
+
+    // 自身が消費済みかチェック
+    void ExistCheck()
+    {
+        if (SaveController.Instance.IsConsumed(this.tag, arrangeId))
+        {
+            isClosed = false;
+            GetComponent<SpriteRenderer>().sprite = openImage;
         }
     }
 }
